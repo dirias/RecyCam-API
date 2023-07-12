@@ -1,5 +1,47 @@
 import tensorflow as tf
 from tensorflow.keras import layers
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
+from sklearn.model_selection import train_test_split
+
+import numpy as np
+import pandas as pd
+
+# Constantes
+HEIGHT = 256
+WIDTH = 256
+CHANNELS = 3
+NUM_EPOCHS = 5
+NUM_CLASS = 2
+tamaño_lote = 32
+
+# Cargar el archivo CSV
+df = pd.read_csv('../data/image_data.csv')
+
+# Obtener las rutas de las imágenes y las etiquetas correspondientes
+image_paths = ['../data/cleaned_images/' + name for name in df['name']]
+labels = df['category']
+
+# Crear listas vacías para almacenar las imágenes y las etiquetas preprocesadas
+processed_images = []
+processed_labels = []
+
+# Recorrer las rutas de las imágenes
+for image_path, label in zip(image_paths, labels):
+    # Cargar la imagen
+    image = load_img(image_path, target_size=(HEIGHT, WIDTH))
+    # Convertir la imagen a un arreglo NumPy
+    image_array = img_to_array(image)
+    # Normalizar los valores de los píxeles entre 0 y 1
+    image_array /= 255.0
+    # Agregar la imagen preprocesada y la etiqueta a las listas correspondientes
+    processed_images.append(image_array)
+    processed_labels.append(label)
+
+# Convertir las listas a arreglos NumPy
+processed_images = np.array(processed_images)
+processed_labels = np.array(processed_labels)
+
+import pdb; pdb.set_trace()
 
 # Definir el modelo CNN
 def crear_modelo_cnn():
@@ -19,7 +61,7 @@ def crear_modelo_cnn():
     modelo = tf.keras.Sequential()
     
     # Capa convolucional 1
-    modelo.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(altura, anchura, canales)))
+    modelo.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(HEIGHT, WIDTH, CHANNELS)))
     modelo.add(layers.MaxPooling2D((2, 2)))
     
     # Capa convolucional 2
@@ -33,7 +75,7 @@ def crear_modelo_cnn():
     # Capa completamente conectada
     modelo.add(layers.Flatten())
     modelo.add(layers.Dense(128, activation='relu'))
-    modelo.add(layers.Dense(num_clases, activation='softmax'))
+    modelo.add(layers.Dense(NUM_CLASS, activation='softmax'))
     
     return modelo
 
@@ -45,8 +87,14 @@ modelo.compile(optimizer='adam',
                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                metrics=['accuracy'])
 
+# Dividir los datos en conjuntos de entrenamiento y prueba
+datos_entrenamiento, datos_prueba, etiquetas_entrenamiento, etiquetas_prueba = train_test_split(
+    processed_images, processed_labels, test_size=0.2, random_state=42)
+
+import pdb; pdb.set_trace()
+
 # Entrenar el modelo
-modelo.fit(datos_entrenamiento, etiquetas_entrenamiento, epochs=num_epochs, batch_size=tamaño_lote)
+modelo.fit(datos_entrenamiento, etiquetas_entrenamiento, epochs=NUM_EPOCHS, batch_size=tamaño_lote)
 
 # Evaluar el modelo
 pérdida, precisión = modelo.evaluate(datos_prueba, etiquetas_prueba)
