@@ -1,6 +1,13 @@
-# Ignoring data .jpg
+# Ignoring data images
 *.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+#ignoring model
+*.h5
 # Byte-compiled / optimized / DLL files
+*.DS_Store
 __pycache__/
 *.py[cod]
 *$py.class
