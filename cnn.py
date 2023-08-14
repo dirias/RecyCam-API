@@ -1,24 +1,25 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 
 import numpy as np
 import pandas as pd
 
 # Constantes
-HEIGHT = 256
-WIDTH = 256
+HEIGHT = 512
+WIDTH = 512
 CHANNELS = 3
-NUM_EPOCHS = 5
+NUM_EPOCHS = 8
 NUM_CLASS = 2
 tamaño_lote = 32
 
 # Cargar el archivo CSV
-df = pd.read_csv('../data/image_data.csv')
+df = pd.read_csv('data/image_data.csv')
 
 # Obtener las rutas de las imágenes y las etiquetas correspondientes
-image_paths = ['../data/cleaned_images/' + name for name in df['name']]
+image_paths = ['data/cleaned_images/' + name for name in df['name']]
 labels = df['category']
 
 # Crear listas vacías para almacenar las imágenes y las etiquetas preprocesadas
@@ -40,8 +41,6 @@ for image_path, label in zip(image_paths, labels):
 # Convertir las listas a arreglos NumPy
 processed_images = np.array(processed_images)
 processed_labels = np.array(processed_labels)
-
-import pdb; pdb.set_trace()
 
 # Definir el modelo CNN
 def crear_modelo_cnn():
@@ -91,7 +90,8 @@ modelo.compile(optimizer='adam',
 datos_entrenamiento, datos_prueba, etiquetas_entrenamiento, etiquetas_prueba = train_test_split(
     processed_images, processed_labels, test_size=0.2, random_state=42)
 
-import pdb; pdb.set_trace()
+etiquetas_entrenamiento = np.where(etiquetas_entrenamiento == 'aceptable', 1, 0)
+etiquetas_prueba = np.where(etiquetas_prueba == 'no', 1, 0)
 
 # Entrenar el modelo
 modelo.fit(datos_entrenamiento, etiquetas_entrenamiento, epochs=NUM_EPOCHS, batch_size=tamaño_lote)
@@ -102,6 +102,24 @@ print('Pérdida:', pérdida)
 print('Precisión:', precisión)
 
 # Utilizar el modelo para hacer predicciones
-predicciones = modelo.predict(datos_nuevas_imagenes)
-etiqueta_predicha = etiquetas_clases[np.argmax(predicciones)]
-print('Etiqueta predicha:', etiqueta_predicha)
+print("etiquetas_entrenamiento data type:", type(etiquetas_entrenamiento))
+print("etiquetas_entrenamiento shape:", etiquetas_entrenamiento.shape)
+
+print("etiquetas_prueba data type:", type(etiquetas_prueba))
+print("etiquetas_prueba shape:", etiquetas_prueba.shape)
+
+# Generate predictions on the training data
+y_pred_entrenamiento = modelo.predict(datos_entrenamiento)
+
+# Calculate predicted probabilities for the positive class
+y_pred_entrenamiento_positive_class = y_pred_entrenamiento[:, 1]
+
+# Convert predicted probabilities to binary class labels
+y_pred_entrenamiento_binary = (y_pred_entrenamiento_positive_class > 0.5).astype(int)
+
+# Calculate F1-Score for training data
+f1_train = f1_score(etiquetas_entrenamiento, y_pred_entrenamiento_binary)
+
+print('F1-Score on Training Data:', f1_train)
+
+modelo.save('cnn_model.h5')
