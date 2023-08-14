@@ -15,7 +15,7 @@ PREDICTION_CATEGORIES = {0: 'No Aceptable',
 app = FastAPI()
 
 # Load the TensorFlow.js model
-model = load_model('../cnn_model.h5')
+model = load_model('cnn_model.h5')
 
 # Configure CORS settings
 origins = [

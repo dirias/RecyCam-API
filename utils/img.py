@@ -2,14 +2,20 @@ from PIL import Image # This requires Pillow library
 import os
 
 # Ejemplo de uso
-TRASH_TYPE = 'plastic'
-TRASH_CATEGORY = 'aceptable'
-INPUT_FOLDER = f'../data/uncleaned_images/{TRASH_TYPE}/{TRASH_CATEGORY}'
-OUTPUT_FOLDER = f'../data/cleaned_images'
+TRASH_TYPE = ['plastic', 'can']
+TRASH_CATEGORY = ['aceptable', 'no_aceptable']
+OUTPUT_FOLDER = f'.data/cleaned_images'
 NEW_WIDTH = 512
 NEW_HEIGHT = 512
 
-def resize_images(input_folder, output_folder, new_width, new_height):
+def main():
+    
+    for t_type in TRASH_TYPE:
+        for t_category in TRASH_CATEGORY:
+            input_folder = f'data/uncleaned_images/{t_type}/{t_category}'
+            resize_images(t_type, t_category, input_folder) 
+
+def resize_images(trash_type, trash_category, input_folder, output_folder=OUTPUT_FOLDER, new_width=NEW_WIDTH, new_height=NEW_HEIGHT):
     # Verificar si la carpeta de salida existe, si no, crearla
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -29,7 +35,7 @@ def resize_images(input_folder, output_folder, new_width, new_height):
             resized_img = img.resize((new_width, new_height))
 
             # Generar el nuevo nombre de archivo
-            new_filename = f"{TRASH_TYPE}_{TRASH_CATEGORY}_{image_counter}.jpg"
+            new_filename = f"{trash_type}_{trash_category}_{image_counter}.jpg"
             image_counter += 1
 
             # Guardar la imagen redimensionada con el nuevo nombre en la carpeta de salida
@@ -37,5 +43,3 @@ def resize_images(input_folder, output_folder, new_width, new_height):
             resized_img.save(output_path)
 
             print(f"Imagen {filename} redimensionada y guardada como {new_filename} en {output_path}")
-
-resize_images(INPUT_FOLDER, OUTPUT_FOLDER, NEW_WIDTH, NEW_HEIGHT)
