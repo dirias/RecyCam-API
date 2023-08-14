@@ -17,13 +17,16 @@ pip install -r requirements.txt
 **dataset link**: https://drive.google.com/drive/folders/1KN3J5OmE2HQUOh1K175mjU2xZ5WoyAk8?usp=sharing
 
 - Place the dataset inside the _**data**_ folder.
-- Run <pending>
 
 ### 3. Run the server
 
-- Move inside the _**app**_ folder.
-- Start the server with <code>uvicorn app:app --host [COMPUTER_IP] --port [DISIRE_PORT]</code>
-- Example: <code>uvicorn app:app --host 192.168.0.6 --port 8000</code>
+- Run <code>python3 start_all.py </code> from the home project directory.
+  
+Or you can manually start the server following these instructions:
+
+    - Move inside the _**app**_ folder.
+    - Run uvicorn app:app --host [COMPUTER_IP] --port [DISIRE_PORT]
+        - Example: <code>uvicorn app:app --host 192.168.0.6 --port 8000</code>
 
 ## Endpoints
 
